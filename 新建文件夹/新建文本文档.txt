@@ -1,0 +1,228 @@
+
+
+
+
+
+
+
+
+
+
+
+
+// send 'databyte' to 'port'	  //设定发送数据字节的端口
+int outp(unsigned port, int databyte);
+
+// read byte from 'port'
+//定义读字节的端口
+int inp(unsigned port);
+
+
+
+
+// Pause for exactly 'tick' number of ticks = 0.25us
+//定义延时时间的函数
+void tickDelay(int tick); // Implementation is platform specific
+
+// 'tick' values
+//定义延时时间变量	
+int A,B,C,D,E,F,G,H,I,J;
+
+//-----------------------------------------------------------------------------
+// Set the 1-Wire timing to 'standard' (standard=1) or 'overdrive' (standard=0).
+//定义一线制的通信时间模式，当变量standard=1时，为普通通讯模式，当standard=0时为高速通信模式。
+
+//设定通信速度
+void SetSpeed(int standard)
+{
+        // Adjust tick values depending on speed
+        if (standard)
+        {
+                // Standard Speed  标准速度
+                A = 6 * 4;
+                B = 64 * 4;
+                C = 60 * 4;
+                D = 10 * 4;
+                E = 9 * 4;
+                F = 55 * 4;
+                G = 0;
+                H = 480 * 4;
+                I = 70 * 4;
+                J = 410 * 4;
+        }
+        else
+        {
+                // Overdrive Speed  高速模式
+                A = 1.5 * 4;
+                B = 7.5 * 4;
+                C = 7.5 * 4;
+                D = 2.5 * 4;
+                E = 0.75 * 4;
+                F = 7 * 4;
+                G = 2.5 * 4;
+                H = 70 * 4;
+                I = 8.5 * 4;
+                J = 40 * 4;
+        }
+}
+
+//-----------------------------------------------------------------------------
+// Generate a 1-Wire reset, return 1 if no presence detect was found,
+// 对一线制元器件复位，如果没有检测到元器件的话将会返回1
+// return 0 otherwise.其他情况返回0
+// (NOTE: Does not handle alarm presence from DS2404/DS1994)
+// 将总线上的器件进行复位
+int OWTouchReset(void)
+{
+        int result;
+        tickDelay(G);
+        outp(PORTADDRESS,0x00); // Drives DQ low
+        tickDelay(H);
+        outp(PORTADDRESS,0x01); // Releases the bus
+        tickDelay(I);
+        result = inp(PORTADDRESS) ^ 0x01; // Sample for presence pulse from slave
+        tickDelay(J); // Complete the reset sequence recovery
+        return result; // Return sample presence pulse result
+}
+
+
+//-----------------------------------------------------------------------------
+// Send a 1-Wire write bit. Provide 10us recovery time.
+//发送一位数据到一线制总线上，恢复时间为10us
+void OWWriteBit(int bit)
+{
+        if (bit)  //如果需要发送的值为1，则写“1”到数据总线上，然后释放总线
+        {
+                // Write '1' bit
+                outp(PORTADDRESS,0x00); // Drives DQ low
+                tickDelay(A);
+                outp(PORTADDRESS,0x01); // Releases the bus
+                tickDelay(B); // Complete the time slot and 10us recovery
+        }
+        else  //否则，将数据“0”发送到数据总线上，然后释放总线
+        {
+                // Write '0' bit
+                outp(PORTADDRESS,0x00); // Drives DQ low
+                tickDelay(C);
+                outp(PORTADDRESS,0x01); // Releases the bus
+                tickDelay(D);
+        }
+}
+
+//-----------------------------------------------------------------------------
+// Read a bit from the 1-Wire bus and return it. Provide 10us recovery time.
+//
+
+int OWReadBit(void)
+{
+        int result;
+        outp(PORTADDRESS,0x00); // Drives DQ low
+        tickDelay(A);
+        outp(PORTADDRESS,0x01); // Releases the bus
+        tickDelay(E);
+        result = inp(PORTADDRESS) & 0x01; // Sample the bit value from the slave
+                                         //对从机的值进行采样
+        tickDelay(F); // Complete the time slot and 10us recovery
+                      //延时，完成全部的时间过程和10us的复位时间
+        return result; //返回所读到的从机值。
+}
+
+//-----------------------------------------------------------------------------
+// Write 1-Wire data byte
+//
+void OWWriteByte(int data)   //写一个字节
+{
+        int loop;   // 定义循环变量
+
+        // Loop to write each bit in the byte, LS-bit first
+        for (loop = 0; loop < 8; loop++)  //让循环变量从0到8之间循环，发送数据
+        {
+                OWWriteBit(data & 0x01); //发送数据的最末位
+
+                // shift the data byte for the next bit
+                data >>= 1; //  字节左移
+        }
+}
+
+//-----------------------------------------------------------------------------
+// Read 1-Wire data byte and return it
+//
+int OWReadByte(void)  // 读一个字节
+{
+        int loop, result=0;  //定义循环值变量及返回值变量
+
+        for (loop = 0; loop < 8; loop++)
+        {
+                // shift the result to get it ready for the next bit
+                result >>= 1;
+
+                // if result is one, then set MS bit
+                if (OWReadBit())  //	如果读的结果为1，就将该值插入最高位。
+                        result |= 0x80;
+        }
+        return result;               //返回结果
+}
+
+//-----------------------------------------------------------------------------
+// Write a 1-Wire data byte and return the sampled result.
+//
+int OWTouchByte(int data)
+{
+        int loop, result=0;
+
+        for (loop = 0; loop < 8; loop++)
+        {
+                // shift the result to get it ready for the next bit
+                result >>= 1;
+
+                // If sending a '1' then read a bit else write a '0'
+                if (data & 0x01)
+                {
+                        if (OWReadBit())
+                                result |= 0x80;
+                }
+                else
+                        OWWriteBit(0);
+
+                // shift the data byte for the next bit
+                data >>= 1;
+        }
+        return result;
+}
+
+//-----------------------------------------------------------------------------
+// Write a block 1-Wire data bytes and return the sampled result in the same
+// buffer.
+//
+void OWBlock(unsigned char *data, int data_len)
+{
+        int loop;
+
+        for (loop = 0; loop < data_len; loop++)
+        {
+                data[loop] = OWTouchByte(data[loop]);
+        }
+}
+
+//-----------------------------------------------------------------------------
+// Set all devices on 1-Wire to overdrive speed. Return '1' if at least one
+// overdrive capable device is detected.
+//
+int OWOverdriveSkip(unsigned char *data, int data_len)
+{
+        // set the speed to 'standard'
+        SetSpeed(1);
+
+        // reset all devices
+        if (OWTouchReset()) // Reset the 1-Wire bus
+                return 0; // Return if no devices found
+
+        // overdrive skip command
+        OWWriteByte(0x3C);
+
+        // set the speed to 'overdrive'
+        SetSpeed(0);
+
+        // do a 1-Wire reset in 'overdrive' and return presence result
+        return OWTouchReset();
+}

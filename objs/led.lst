@@ -1,0 +1,229 @@
+   1               		.file	"led.c"
+   2               		.arch atmega128
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  17               	.Ltext0:
+  18               	.global	toggle_red
+  20               	toggle_red:
+  21               	.LFB6:
+  22               	.LM1:
+  23               	/* prologue: frame size=0 */
+  24               	/* prologue end (size=0) */
+  25               	.LM2:
+  26 0000 D198      		cbi 58-0x20,1
+  27               	.LM3:
+  28 0002 89B3      		in r24,57-0x20
+  29 0004 9927      		clr r25
+  30               	.LVL0:
+  31               	.LM4:
+  32 0006 D19A      		sbi 58-0x20,1
+  33               	.LM5:
+  34 0008 22E0      		ldi r18,lo8(2)
+  35 000a 30E0      		ldi r19,hi8(2)
+  36 000c 8227      		eor r24,r18
+  37 000e 9327      		eor r25,r19
+  38 0010 8BBB      		out 59-0x20,r24
+  39               	/* epilogue: frame size=0 */
+  40 0012 0895      		ret
+  41               	/* epilogue end (size=1) */
+  42               	/* function toggle_red size 10 (9) */
+  43               	.LFE6:
+  45               	.global	led_dis
+  47               	led_dis:
+  48               	.LFB8:
+  49               	.LM6:
+  50               	/* prologue: frame size=0 */
+  51               	/* prologue end (size=0) */
+  52               	.LVL1:
+  53               	.LM7:
+  54 0014 2AB3      		in r18,58-0x20
+  55 0016 2760      		ori r18,lo8(7)
+  56 0018 2ABB      		out 58-0x20,r18
+  57               	.LM8:
+  58 001a 8BBB      		out 59-0x20,r24
+  59               	/* epilogue: frame size=0 */
+  60 001c 0895      		ret
+  61               	/* epilogue end (size=1) */
+  62               	/* function led_dis size 5 (4) */
+  63               	.LFE8:
+  65               	.global	redOn
+  67               	redOn:
+  68               	.LFB7:
+  69               	.LM9:
+  70               	/* prologue: frame size=0 */
+  71               	/* prologue end (size=0) */
+  72               	.LBB8:
+  73               	.LBB9:
+  74               	.LM10:
+  75 001e 8AB3      		in r24,58-0x20
+  76 0020 8760      		ori r24,lo8(7)
+  77 0022 8ABB      		out 58-0x20,r24
+  78               	.LM11:
+  79 0024 85E0      		ldi r24,lo8(5)
+  80 0026 8BBB      		out 59-0x20,r24
+  81               	.LBE9:
+  82               	.LBE8:
+  83               	/* epilogue: frame size=0 */
+  84 0028 0895      		ret
+  85               	/* epilogue end (size=1) */
+  86               	/* function redOn size 6 (5) */
+  87               	.LFE7:
+  89               	.global	Dig2Led
+  91               	Dig2Led:
+  92               	.LFB9:
+  93               	.LM12:
+  94               	/* prologue: frame size=0 */
+  95               	/* prologue end (size=0) */
+  96               	.LVL2:
+  97 002a AC01      		movw r20,r24
+  98               	.LBB34:
+  99               	.LBB35:
+ 100               	.LM13:
+ 101 002c 8AB3      		in r24,58-0x20
+ 102               	.LVL3:
+ 103 002e 8760      		ori r24,lo8(7)
+ 104 0030 8ABB      		out 58-0x20,r24
+ 105               	.LM14:
+ 106 0032 4BBB      		out 59-0x20,r20
+ 107 0034 28E8      		ldi r18,lo8(5000)
+ 108 0036 33E1      		ldi r19,hi8(5000)
+ 109               	.LVL4:
+ 110 0038 E8EB      		ldi r30,lo8(184)
+ 111 003a F0E0      		ldi r31,hi8(184)
+ 112               	.L8:
+ 113               	.LBE35:
+ 114               	.LBE34:
+ 115               	.LBB36:
+ 116               	.LBB37:
+ 117               	.LBB38:
+ 118               	.LBB39:
+ 119               	.LM15:
+ 120 003c CF01      		movw r24,r30
+ 121               	.LVL5:
+ 122               	/* #APP */
+ 123 003e 0197      		1: sbiw r24,1
+ 124 0040 01F4      		brne 1b
+ 125               	/* #NOAPP */
+ 126               	.LBE39:
+ 127               	.LBE38:
+ 128               	.LM16:
+ 129 0042 2150      		subi r18,lo8(-(-1))
+ 130 0044 3040      		sbci r19,hi8(-(-1))
+ 131               	.LM17:
+ 132 0046 01F4      		brne .L8
+ 133               	.LBE37:
+ 134               	.LBE36:
+ 135               	.LBB40:
+ 136               	.LBB41:
+ 137               	.LM18:
+ 138 0048 8AB3      		in r24,58-0x20
+ 139               	.LVL6:
+ 140 004a 8760      		ori r24,lo8(7)
+ 141 004c 8ABB      		out 58-0x20,r24
+ 142               	.LM19:
+ 143 004e CA01      		movw r24,r20
+ 144 0050 23E0      		ldi r18,3
+ 145 0052 9595      	1:	asr r25
+ 146 0054 8795      		ror r24
+ 147 0056 2A95      		dec r18
+ 148 0058 01F4      		brne 1b
+ 149               	.LVL7:
+ 150 005a 8BBB      		out 59-0x20,r24
+ 151 005c 28E8      		ldi r18,lo8(5000)
+ 152 005e 33E1      		ldi r19,hi8(5000)
+ 153               	.LVL8:
+ 154 0060 E8EB      		ldi r30,lo8(184)
+ 155 0062 F0E0      		ldi r31,hi8(184)
+ 156               	.L10:
+ 157               	.LBE41:
+ 158               	.LBE40:
+ 159               	.LBB42:
+ 160               	.LBB43:
+ 161               	.LBB44:
+ 162               	.LBB45:
+ 163               	.LM20:
+ 164 0064 CF01      		movw r24,r30
+ 165               	.LVL9:
+ 166               	/* #APP */
+ 167 0066 0197      		1: sbiw r24,1
+ 168 0068 01F4      		brne 1b
+ 169               	/* #NOAPP */
+ 170               	.LBE45:
+ 171               	.LBE44:
+ 172               	.LM21:
+ 173 006a 2150      		subi r18,lo8(-(-1))
+ 174 006c 3040      		sbci r19,hi8(-(-1))
+ 175               	.LM22:
+ 176 006e 01F4      		brne .L10
+ 177               	.LBE43:
+ 178               	.LBE42:
+ 179               	.LBB46:
+ 180               	.LBB47:
+ 181               	.LM23:
+ 182 0070 8AB3      		in r24,58-0x20
+ 183               	.LVL10:
+ 184 0072 8760      		ori r24,lo8(7)
+ 185 0074 8ABB      		out 58-0x20,r24
+ 186               	.LM24:
+ 187 0076 86E0      		ldi r24,6
+ 188 0078 5595      	1:	asr r21
+ 189 007a 4795      		ror r20
+ 190 007c 8A95      		dec r24
+ 191 007e 01F4      		brne 1b
+ 192 0080 4BBB      		out 59-0x20,r20
+ 193 0082 28E8      		ldi r18,lo8(5000)
+ 194 0084 33E1      		ldi r19,hi8(5000)
+ 195               	.LVL11:
+ 196 0086 E8EB      		ldi r30,lo8(184)
+ 197 0088 F0E0      		ldi r31,hi8(184)
+ 198               	.L12:
+ 199               	.LBE47:
+ 200               	.LBE46:
+ 201               	.LBB48:
+ 202               	.LBB49:
+ 203               	.LBB50:
+ 204               	.LBB51:
+ 205               	.LM25:
+ 206 008a CF01      		movw r24,r30
+ 207               	.LVL12:
+ 208               	/* #APP */
+ 209 008c 0197      		1: sbiw r24,1
+ 210 008e 01F4      		brne 1b
+ 211               	/* #NOAPP */
+ 212               	.LBE51:
+ 213               	.LBE50:
+ 214               	.LM26:
+ 215 0090 2150      		subi r18,lo8(-(-1))
+ 216 0092 3040      		sbci r19,hi8(-(-1))
+ 217               	.LM27:
+ 218 0094 01F4      		brne .L12
+ 219               	.LBE49:
+ 220               	.LBE48:
+ 221               	/* epilogue: frame size=0 */
+ 222 0096 0895      		ret
+ 223               	/* epilogue end (size=1) */
+ 224               	/* function Dig2Led size 67 (66) */
+ 225               	.LFE9:
+ 227               		.comm ReadMemoryBuffle,128,1
+ 271               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 led.c
+     /tmp/ccvNy6e8.s:3      *ABS*:0000003f __SREG__
+     /tmp/ccvNy6e8.s:4      *ABS*:0000003e __SP_H__
+     /tmp/ccvNy6e8.s:5      *ABS*:0000003d __SP_L__
+     /tmp/ccvNy6e8.s:6      *ABS*:00000000 __tmp_reg__
+     /tmp/ccvNy6e8.s:7      *ABS*:00000001 __zero_reg__
+     /tmp/ccvNy6e8.s:20     .text:00000000 toggle_red
+     /tmp/ccvNy6e8.s:47     .text:00000014 led_dis
+     /tmp/ccvNy6e8.s:67     .text:0000001e redOn
+     /tmp/ccvNy6e8.s:91     .text:0000002a Dig2Led
+                            *COM*:00000080 ReadMemoryBuffle
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
